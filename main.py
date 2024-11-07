@@ -1,13 +1,18 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 import requests
 import os
 
 app = FastAPI()
 
+# Define the request model
+class NotionContent(BaseModel):
+    content: str
+
 # Endpoint to add text to Notion
 @app.post("/add_to_notion")
-async def add_to_notion(content: str):
-    url = f"https://api.notion.com/v1/pages"
+async def add_to_notion(content: NotionContent):
+    url = "https://api.notion.com/v1/pages"
     headers = {
         "Authorization": f"Bearer {os.getenv('NOTION_API_TOKEN')}",
         "Content-Type": "application/json",
@@ -17,7 +22,7 @@ async def add_to_notion(content: str):
         "parent": {"page_id": os.getenv("NOTION_PAGE_ID")},
         "properties": {
             "title": {
-                "title": [{"text": {"content": content}}]
+                "title": [{"text": {"content": content.content}}]  # Note: Access content through the model
             }
         }
     }
