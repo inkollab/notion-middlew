@@ -5,6 +5,11 @@ import os
 
 app = FastAPI()
 
+# Root endpoint to confirm app is running
+@app.get("/")
+async def root():
+    return {"message": "App is running"}
+
 # Define the request model
 class NotionContent(BaseModel):
     content: str
@@ -22,7 +27,7 @@ async def add_to_notion(content: NotionContent):
         "parent": {"page_id": os.getenv("NOTION_PAGE_ID")},
         "properties": {
             "title": {
-                "title": [{"text": {"content": content.content}}]  # Note: Access content through the model
+                "title": [{"text": {"content": content.content}}]
             }
         }
     }
