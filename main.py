@@ -1,7 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import requests
 import os
+import httpx
 
 app = FastAPI()
 
@@ -31,7 +31,12 @@ async def add_to_notion(content: NotionContent):
             }
         }
     }
-    response = requests.post(url, headers=headers, json=data)
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, headers=headers, json=data)
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+
     return {"status": response.status_code, "data": response.json()}
 
 # Endpoint to retrieve text from Notion (simplified for example)
@@ -42,5 +47,10 @@ async def retrieve_from_notion():
         "Authorization": f"Bearer {os.getenv('NOTION_API_TOKEN')}",
         "Notion-Version": "2022-06-28"
     }
-    response = requests.get(url, headers=headers)
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, headers=headers)
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+
     return {"status": response.status_code, "data": response.json()}
