@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import os
 import httpx
 
+# Initialize the FastAPI application
 app = FastAPI()
 
 # Root endpoint to confirm app is running
@@ -10,7 +11,7 @@ app = FastAPI()
 async def root():
     return {"message": "App is running"}
 
-# Define the request model
+# Define the request model for adding content to Notion
 class NotionContent(BaseModel):
     content: str
 
